@@ -1,0 +1,43 @@
+use Abos;
+
+drop table if exists einkauf;
+drop table if exists clients;
+drop table if exists kurse;
+drop table if exists kursebesuche;
+drop table if exists abos;
+
+create table clients
+(
+    client_id int unsigned auto_increment primary key,
+    aboanzahl int unsigned default null,
+    vorname	varchar(30) not null,
+    nachname varchar(30) not null,
+    ort char(10) not null,
+    telefonnummer int
+);
+
+create table kurse
+(
+	kurs_id int unsigned auto_increment primary key,
+    kurse char (20) not null,
+    preis int unsigned not null
+);
+
+create table abos
+(
+	abo_id int unsigned auto_increment primary key,
+    abos char(10) not null 
+);
+
+create table einkauf
+(
+	einkauf_id int unsigned auto_increment primary key,
+    client_id int unsigned not null,
+	kurs_id int unsigned,
+    abo_id int unsigned,
+	einkaufsdatum datetime not null,
+    kursdatum datetime not null,
+    foreign key (client_id) references clients (client_id),
+    foreign key (kurs_id) references kurse (kurs_id),
+    foreign key (abo_id) references abos (abo_id)
+);
