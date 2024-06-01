@@ -44,12 +44,26 @@ class Application(tk.Tk):
         self.new_course_visit = tk.Button(self, text="Neuer Kursbesuch", command=self.create_course_visit_form)
         self.new_course_visit.pack(side="top", padx=10, pady=5)
 
-    def submit_course_visit(self):
-    # Deine bestehenden Codezeilen hier...
-
-    # Wenn das neue Abo weniger als oder gleich 2 ist, erstelle eine E-Mail
-    if abo_state == 2:
-        self.send_email_alert(givenname, surname, abo_state)
+    def send_email_alert(self, givenname, surname, abo_count):
+        # E-Mail-Parameter konfigurieren
+        sender_email = "deine_email@example.com"
+        receiver_email = "ziel_email@example.com"
+        subject = "Abo-Benachrichtigung"
+        body = f"Hallo {givenname} {surname}, Sie haben nur noch {abo_count} Abos übrig."
+    
+        # E-Mail erstellen
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        message["Subject"] = subject
+        message.attach(MIMEText(body, "plain"))
+    
+        # E-Mail senden
+        with smtplib.SMTP("smtp.example.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, "dein_passwort")
+            text = message.as_string()
+            server.sendmail(sender_email, receiver_email, text)
 
     def clear_canvas_form(self):
         if hasattr(self, 'canvas_form'):
@@ -233,6 +247,9 @@ class Application(tk.Tk):
                     update_query = "UPDATE clients SET aboanzahl = %s WHERE client_id = %s"
                     self.cursor.execute(update_query, (abo_state, client_id))
                     self.db_connection.commit()
+
+                    if abo_state == 2:
+                        self.send_email_alert(givenname, surname, abo_state)
                 else:
                     messagebox.showerror("Error", "kein abo übrig")
 
